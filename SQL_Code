@@ -1,0 +1,51 @@
+select * from college .big_wheel_data;
+ALTER TABLE college.big_wheel_data DROP COLUMN `Date_[0]`;
+
+-- Count of calls made
+
+select count(*) 
+         as Calls_Made 
+                 from college.big_wheel_data;
+                 
+-- count of Each Responce 
+
+Select Responce, count(Responce)  as Responce_Count 
+   from college.big_wheel_data
+   group by Responce;
+   
+   -- Count of each Responses for Each City 
+   
+   Select City , 
+           sum(case when Responce = 'Interested' then 1 else 0 end ) As Intesrested_Count,
+           sum(case when Responce = 'Not Interested' then 1 else 0 end ) as Not_Interested_count,
+           sum(case when Responce = 'Follow up' then 1 else 0 end ) as Follow_Up_Count,
+           sum(case when Responce = 'Ring No Responce' then 1 else 0 end ) as RNR_Count
+  from college.big_wheel_data
+  group by City ;
+  
+ 
+ -- Percenatge Of Responces For each call Made
+ 
+Select Responce , Count(*) as Count_per_responce,
+                Round( Count(*)*100.0/ (select Count(*) from college.big_wheel_data ) , 2 ) as Responce_Percentage 
+          from college.big_wheel_data
+          group by Responce;
+		
+  -- Inerested Percentage for Each City
+  
+Select City, Count(*) as Count_of_Interested,
+                Round( Count(*)*100.0/ (select Count(*) from college.big_wheel_data ) , 2 ) as Interested_Percentage 
+          from college.big_wheel_data
+          where Responce ='Interested'
+          group by  City;
+          
+   -- Percentage of responces for Each City
+          
+select 
+      city ,
+      Round (100.0*sum(Case when Responce = 'Interested' then 1 else 0 end )/ count(*) ,2) as Intrested_Percentage,
+      Round (100.0*sum(Case when Responce = 'Not Interested' then 1 else 0 end )/ count(*) ,2) as Not_Intrested_Percentage,
+      Round (100.0*sum(Case when Responce = 'Follow up' then 1 else 0 end) / count(*) ,2) as Follow_Up_Percentage,
+      Round (100.0*sum(Case when Responce = 'Ring No Responce' then 1 else 0 end) / count(*) ,2) as Ring_No_Responce_Percentage
+FROM college.big_wheel_data
+group by City order by Intrested_Percentage desc;
